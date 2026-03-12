@@ -1,0 +1,3 @@
+com.hshim.springapiassist.configuration.ApiLogAutoConfiguration
+com.hshim.springapiassist.configuration.McpAutoConfiguration
+com.hshim.springapiassist.configuration.ApiDocumentAutoConfiguration

@@ -1,0 +1,330 @@
+{
+  "properties": [
+    {
+      "name": "api-assist.log.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable or disable the entire API logging filter.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties",
+      "defaultValue": true
+    },
+    {
+      "name": "api-assist.log.app-name",
+      "type": "java.lang.String",
+      "description": "Logical name of this application. Included in every log entry as appName.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties",
+      "defaultValue": ""
+    },
+    {
+      "name": "api-assist.log.include-paths",
+      "type": "java.util.List<java.lang.String>",
+      "description": "Ant-style URL path patterns to include for logging. When non-empty, only matching paths are logged (e.g. /api/**). Takes precedence over exclude-paths.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties"
+    },
+    {
+      "name": "api-assist.log.exclude-paths",
+      "type": "java.util.List<java.lang.String>",
+      "description": "Ant-style URL path patterns to exclude from logging (e.g. /actuator/**).",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties"
+    },
+    {
+      "name": "api-assist.log.mask-headers",
+      "type": "java.util.List<java.lang.String>",
+      "description": "Request header names whose values are replaced with *** in the log.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties",
+      "defaultValue": [
+        "Authorization",
+        "Cookie",
+        "Set-Cookie"
+      ]
+    },
+    {
+      "name": "api-assist.log.mask-request-body",
+      "type": "java.lang.Boolean",
+      "description": "Replace the entire request body with *** instead of recording the actual content.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "api-assist.log.mask-response-body",
+      "type": "java.lang.Boolean",
+      "description": "Replace the entire response body with *** instead of recording the actual content.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "api-assist.log.max-body-size",
+      "type": "java.lang.Integer",
+      "description": "Maximum number of characters recorded for request/response bodies. Excess is truncated.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties",
+      "defaultValue": 10000
+    },
+    {
+      "name": "api-assist.log.storage.db.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable DB table storage using the application's configured DataSource. Requires spring-boot-starter-jdbc.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$DBStorageProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "api-assist.log.storage.db.table-name",
+      "type": "java.lang.String",
+      "description": "Name of the table used to store API logs.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$DBStorageProperties",
+      "defaultValue": "api_logs"
+    },
+    {
+      "name": "api-assist.log.storage.db.auto-create-table",
+      "type": "java.lang.Boolean",
+      "description": "Automatically execute CREATE TABLE IF NOT EXISTS on startup.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$DBStorageProperties",
+      "defaultValue": true
+    },
+    {
+      "name": "api-assist.log.storage.local-file.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable local file storage.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$LocalFileStorageProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "api-assist.log.storage.local-file.path",
+      "type": "java.lang.String",
+      "description": "Directory path where log files are written.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$LocalFileStorageProperties",
+      "defaultValue": "./logs/api"
+    },
+    {
+      "name": "api-assist.log.storage.local-file.logs-per-file",
+      "type": "java.lang.Integer",
+      "description": "Number of log entries buffered before a new file is flushed.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$LocalFileStorageProperties",
+      "defaultValue": 1000
+    },
+    {
+      "name": "api-assist.log.storage.local-file.flush-interval-seconds",
+      "type": "java.lang.Long",
+      "description": "Interval in seconds at which buffered log entries are flushed to a file, regardless of logs-per-file. Set to 0 to disable.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$LocalFileStorageProperties",
+      "defaultValue": 0
+    },
+    {
+      "name": "api-assist.log.storage.local-file.format",
+      "type": "com.hshim.springapiassist.log.enums.LogFileFormat",
+      "description": "Output file format. JSON produces JSONL; CSV produces a CSV with a header row.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$LocalFileStorageProperties",
+      "defaultValue": "JSON"
+    },
+    {
+      "name": "api-assist.log.storage.supabase-db.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable Supabase PostgreSQL storage with a dedicated connection (independent of the app DataSource).",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$SupabaseDBStorageProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "api-assist.log.storage.supabase-db.jdbc-url",
+      "type": "java.lang.String",
+      "description": "JDBC URL for the Supabase PostgreSQL database. e.g. jdbc:postgresql://db.[project-ref].supabase.co:5432/postgres",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$SupabaseDBStorageProperties"
+    },
+    {
+      "name": "api-assist.log.storage.supabase-db.username",
+      "type": "java.lang.String",
+      "description": "Supabase DB username.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$SupabaseDBStorageProperties",
+      "defaultValue": "postgres"
+    },
+    {
+      "name": "api-assist.log.storage.supabase-db.password",
+      "type": "java.lang.String",
+      "description": "Supabase DB password (found in Project Settings > Database).",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$SupabaseDBStorageProperties"
+    },
+    {
+      "name": "api-assist.log.storage.supabase-db.table-name",
+      "type": "java.lang.String",
+      "description": "Name of the table used to store API logs.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$SupabaseDBStorageProperties",
+      "defaultValue": "api_logs"
+    },
+    {
+      "name": "api-assist.log.storage.supabase-db.auto-create-table",
+      "type": "java.lang.Boolean",
+      "description": "Automatically execute CREATE TABLE IF NOT EXISTS on startup.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$SupabaseDBStorageProperties",
+      "defaultValue": true
+    },
+    {
+      "name": "api-assist.log.storage.supabase-s3.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable Supabase S3-compatible storage.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$SupabaseS3StorageProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "api-assist.log.storage.supabase-s3.endpoint-url",
+      "type": "java.lang.String",
+      "description": "Supabase S3-compatible endpoint URL. Format: https://[project-ref].supabase.co/storage/v1/s3",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$SupabaseS3StorageProperties"
+    },
+    {
+      "name": "api-assist.log.storage.supabase-s3.access-key-id",
+      "type": "java.lang.String",
+      "description": "S3 access key ID — found in Supabase Dashboard > Project Settings > Storage > S3 Access Keys.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$SupabaseS3StorageProperties"
+    },
+    {
+      "name": "api-assist.log.storage.supabase-s3.secret-access-key",
+      "type": "java.lang.String",
+      "description": "S3 secret access key — generated when creating Supabase S3 access keys.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$SupabaseS3StorageProperties"
+    },
+    {
+      "name": "api-assist.log.storage.supabase-s3.region",
+      "type": "java.lang.String",
+      "description": "AWS region string.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$SupabaseS3StorageProperties",
+      "defaultValue": "ap-northeast-1"
+    },
+    {
+      "name": "api-assist.log.storage.supabase-s3.bucket",
+      "type": "java.lang.String",
+      "description": "Target bucket name in Supabase Storage.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$SupabaseS3StorageProperties",
+      "defaultValue": "api-logs"
+    },
+    {
+      "name": "api-assist.log.storage.supabase-s3.key-prefix",
+      "type": "java.lang.String",
+      "description": "S3 object key prefix (acts as a folder path).",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$SupabaseS3StorageProperties",
+      "defaultValue": "logs/"
+    },
+    {
+      "name": "api-assist.log.storage.supabase-s3.logs-per-file",
+      "type": "java.lang.Integer",
+      "description": "Number of log entries buffered before uploading a new file.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$SupabaseS3StorageProperties",
+      "defaultValue": 1000
+    },
+    {
+      "name": "api-assist.log.storage.supabase-s3.format",
+      "type": "com.hshim.springapiassist.log.enums.LogFileFormat",
+      "description": "Output file format.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$SupabaseS3StorageProperties",
+      "defaultValue": "JSON"
+    },
+    {
+      "name": "api-assist.log.view.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable the built-in view API (log ingestion + query endpoints). Requires DB storage.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$ViewProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "api-assist.log.view.base-path",
+      "type": "java.lang.String",
+      "description": "Base path for all view API endpoints.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$ViewProperties",
+      "defaultValue": "/api/logs"
+    },
+    {
+      "name": "api-assist.log.view.api-key",
+      "type": "java.lang.String",
+      "description": "When set, all view API requests must include the X-Api-Key header. Leave blank to disable authentication.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties$ViewProperties",
+      "defaultValue": ""
+    },
+    {
+      "name": "api-assist.mcp.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable or disable the MCP (Model Context Protocol) server integration.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.McpProperties",
+      "defaultValue": true
+    },
+    {
+      "name": "api-assist.mcp.server-info.name",
+      "type": "java.lang.String",
+      "description": "Display name of this MCP server, exposed in the server-info response.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.McpProperties",
+      "defaultValue": "Spring API Docs MCP Server"
+    },
+    {
+      "name": "api-assist.mcp.server-info.version",
+      "type": "java.lang.String",
+      "description": "Version string of this MCP server, exposed in the server-info response.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.McpProperties",
+      "defaultValue": "1.0.0"
+    },
+    {
+      "name": "api-assist.mcp.transport.sse.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable the SSE (Server-Sent Events) transport endpoint for MCP communication.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.McpProperties",
+      "defaultValue": true
+    },
+    {
+      "name": "api-assist.mcp.transport.sse.base-path",
+      "type": "java.lang.String",
+      "description": "Base path for the SSE transport endpoint.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.McpProperties",
+      "defaultValue": "/mcp/sse"
+    },
+    {
+      "name": "api-assist.mcp.transport.http.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable the HTTP (Streamable HTTP) transport endpoint for MCP communication.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.McpProperties",
+      "defaultValue": true
+    },
+    {
+      "name": "api-assist.mcp.transport.base-path",
+      "type": "java.lang.String",
+      "description": "Base path for the HTTP transport endpoint.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.McpProperties",
+      "defaultValue": "/mcp"
+    },
+    {
+      "name": "api-assist.document.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable or disable the API document feature that introspects and exposes Spring MVC endpoint metadata.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.DocumentProperties",
+      "defaultValue": true
+    },
+    {
+      "name": "api-assist.document.view.base-path",
+      "type": "java.lang.String",
+      "description": "Base path for the API document query endpoints.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.DocumentProperties",
+      "defaultValue": "/api/documents"
+    }
+  ],
+  "hints": [
+    {
+      "name": "api-assist.log.storage.local-file.format",
+      "values": [
+        {
+          "value": "JSON",
+          "description": "JSONL — one JSON object per line"
+        },
+        {
+          "value": "CSV",
+          "description": "CSV — header row followed by data rows"
+        }
+      ]
+    },
+    {
+      "name": "api-assist.log.storage.supabase-s3.format",
+      "values": [
+        {
+          "value": "JSON",
+          "description": "JSONL — one JSON object per line"
+        },
+        {
+          "value": "CSV",
+          "description": "CSV — header row followed by data rows"
+        }
+      ]
+    }
+  ]
+}

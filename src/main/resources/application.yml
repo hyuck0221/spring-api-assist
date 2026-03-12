@@ -1,0 +1,66 @@
+api-assist:
+
+  document:
+    enabled: true
+    view:
+      base-path: /api/documents
+
+  log:
+    enabled: true
+    app-name: my-app-name
+    include-paths:
+      - /**
+    exclude-paths:
+      - /swagger-ui/**
+    mask-headers:
+      - Authorization
+      - Cookie
+      - Set-Cookie
+    mask-request-body: false
+    mask-response-body: false
+    max-body-size: 10000
+    storage:
+      db:
+        enabled: false
+        table-name: api_logs
+        auto-create-table: true
+      local-file:
+        enabled: false
+        path: ./logs/api
+        logs-per-file: 1000
+        flush-interval-seconds: 0
+        format: JSON
+      supabase-db:
+        enabled: false
+        jdbc-url: my-supabase-db-url
+        username: postgres
+        password: my-supabase-password
+        table-name: api_logs
+        auto-create-table: true
+      supabase-s3:
+        enabled: false
+        endpoint-url: my-supabase-s3-url
+        access-key-id: my-supabase-s3-access-key-id
+        secret-access-key: my-supabase-s3-secret-access-key
+        region: ap-northeast-1
+        bucket: api-logs
+        key-prefix: logs/
+        logs-per-file: 1000
+        format: JSON
+    view:
+      enabled: false
+      base-path: /api/logs
+      api-key:
+
+  mcp:
+    enabled: true
+    server-info:
+      name: Spring API Docs MCP Server
+      version: 1.0.0
+    transport:
+      sse:
+        enabled: true
+        base-path: /mcp/sse
+      http:
+        enabled: true
+        base-path: /mcp
