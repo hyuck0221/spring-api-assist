@@ -126,7 +126,10 @@ class ApiLogFilter(
     ): String? {
         if (bytes.isEmpty()) return null
         if (masked) return "***"
-        val charset = encoding?.let { runCatching { charset(it) }.getOrNull() } ?: Charsets.UTF_8
+        val charset = encoding
+            ?.takeIf { it.isNotBlank() && !it.equals("ISO-8859-1", ignoreCase = true) }
+            ?.let { runCatching { charset(it) }.getOrNull() }
+            ?: Charsets.UTF_8
         val body = String(bytes, charset)
         return if (body.length > maxSize) "${body.substring(0, maxSize)}...[truncated]" else body
     }

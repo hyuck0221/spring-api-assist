@@ -38,7 +38,7 @@ internal class CachingResponseWrapper(response: HttpServletResponse) : HttpServl
     override fun getWriter(): PrintWriter {
         if (cachedWriter == null) {
             cachedWriter = PrintWriter(
-                OutputStreamWriter(buffer, characterEncoding ?: "UTF-8"),
+                OutputStreamWriter(buffer, Charsets.UTF_8),
                 true,
             )
         }
