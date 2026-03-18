@@ -87,7 +87,8 @@ class ApiLogViewService(
             .filterKeys { it != null }
             .mapKeys { it.key as String }
 
-        val aggSql = "SELECT AVG(processing_time_ms), MAX(processing_time_ms) FROM $table $whereClause"
+        val aggConnector = if (whereClause.isBlank()) "WHERE" else "AND"
+        val aggSql = "SELECT AVG(processing_time_ms), MAX(processing_time_ms) FROM $table $whereClause $aggConnector processing_time_ms IS NOT NULL"
         val (avg, max) = jdbcTemplate.queryForObject(aggSql, { rs, _ ->
             (rs.getDouble(1)) to (rs.getLong(2))
         }, *params.toTypedArray()) ?: (0.0 to 0L)
@@ -153,12 +154,14 @@ class ApiLogViewService(
      * This avoids DB-specific percentile functions (e.g., `PERCENTILE_CONT`).
      */
     private fun calcPercentile(pct: Int, whereClause: String, params: List<Any>): Long? {
-        val countSql = "SELECT COUNT(*) FROM $table $whereClause"
+        val connector = if (whereClause.isBlank()) "WHERE" else "AND"
+        val notNullClause = "$whereClause $connector processing_time_ms IS NOT NULL"
+        val countSql = "SELECT COUNT(*) FROM $table $notNullClause"
         val total = jdbcTemplate.queryForObject(countSql, Long::class.java, *params.toTypedArray()) ?: 0L
         if (total == 0L) return null
         val offset = ((total * pct / 100.0).toLong()).coerceIn(0, total - 1)
         val sql =
-            "SELECT processing_time_ms FROM $table $whereClause ORDER BY processing_time_ms LIMIT 1 OFFSET $offset"
+            "SELECT processing_time_ms FROM $table $notNullClause ORDER BY processing_time_ms LIMIT 1 OFFSET $offset"
         return jdbcTemplate.queryForObject(sql, Long::class.java, *params.toTypedArray())
     }
 
