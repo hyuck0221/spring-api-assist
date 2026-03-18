@@ -1,12 +1,12 @@
 package com.hshim.springapiassist.log.view.filter
 
-import com.hshim.springapiassist.configuration.properties.ApiLogProperties
+import com.hshim.springapiassist.configuration.properties.ApiAssistProperties
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.web.filter.OncePerRequestFilter
 
-class ApiLogViewAuthFilter(private val properties: ApiLogProperties) : OncePerRequestFilter() {
+class ApiLogViewAuthFilter(private val properties: ApiAssistProperties) : OncePerRequestFilter() {
 
     companion object {
         const val HEADER_NAME = "X-Api-Key"
@@ -17,7 +17,7 @@ class ApiLogViewAuthFilter(private val properties: ApiLogProperties) : OncePerRe
         response: HttpServletResponse,
         filterChain: FilterChain,
     ) {
-        val expectedKey = properties.view.apiKey.trim()
+        val expectedKey = properties.apiKey.trim()
 
         if (expectedKey.isBlank()) {
             filterChain.doFilter(request, response)

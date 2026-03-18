@@ -1,4 +1,5 @@
 api-assist:
+  api-key:
 
   document:
     enabled: true
@@ -50,7 +51,6 @@ api-assist:
     view:
       enabled: false
       base-path: /api/logs
-      api-key:
 
   mcp:
     enabled: true

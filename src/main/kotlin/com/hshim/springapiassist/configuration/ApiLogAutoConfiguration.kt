@@ -11,7 +11,9 @@ import com.hshim.springapiassist.log.view.controller.ApiLogViewController
 import com.hshim.springapiassist.log.view.filter.ApiLogViewAuthFilter
 import com.hshim.springapiassist.log.view.service.ApiLogFileService
 import com.hshim.springapiassist.log.view.service.ApiLogViewService
+import com.hshim.springapiassist.configuration.properties.ApiAssistProperties
 import com.hshim.springapiassist.configuration.properties.ApiLogProperties
+import com.hshim.springapiassist.configuration.properties.DocumentProperties
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
@@ -29,7 +31,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 
 @AutoConfiguration(after = [JdbcTemplateAutoConfiguration::class])
 @ConditionalOnWebApplication
-@EnableConfigurationProperties(ApiLogProperties::class)
+@EnableConfigurationProperties(ApiAssistProperties::class, ApiLogProperties::class)
 @ConditionalOnProperty(prefix = "api-assist.log", name = ["enabled"], havingValue = "true", matchIfMissing = true)
 class ApiLogAutoConfiguration {
 
@@ -54,8 +56,16 @@ class ApiLogAutoConfiguration {
     @Bean
     fun apiLogFilter(
         properties: ApiLogProperties,
+        documentProperties: DocumentProperties,
         storagesProvider: ObjectProvider<ApiLogStorage>,
-    ): ApiLogFilter = ApiLogFilter(properties, storagesProvider.orderedStream().toList())
+    ): ApiLogFilter = ApiLogFilter(
+        properties = properties,
+        storages = storagesProvider.orderedStream().toList(),
+        internalExcludePaths = listOf(
+            "${properties.view.basePath}/**",
+            "${documentProperties.view.basePath}/**",
+        ),
+    )
 
     @Bean
     fun apiLogFilterRegistration(apiLogFilter: ApiLogFilter): FilterRegistrationBean<ApiLogFilter> =
@@ -112,13 +122,16 @@ class ApiLogAutoConfiguration {
         ): ApiLogViewController = ApiLogViewController(viewService, storagesProvider)
 
         @Bean
-        @ConditionalOnProperty(prefix = "api-assist.log.view", name = ["api-key"], matchIfMissing = false)
+        @ConditionalOnProperty(prefix = "api-assist", name = ["api-key"], matchIfMissing = false)
         fun apiLogViewAuthFilterRegistration(
+            apiAssistProperties: ApiAssistProperties,
             properties: ApiLogProperties,
+            documentProperties: DocumentProperties,
         ): FilterRegistrationBean<ApiLogViewAuthFilter> =
-            FilterRegistrationBean(ApiLogViewAuthFilter(properties)).apply {
+            FilterRegistrationBean(ApiLogViewAuthFilter(apiAssistProperties)).apply {
                 order = Ordered.HIGHEST_PRECEDENCE
                 addUrlPatterns("${properties.view.basePath}/*")
+                addUrlPatterns("${documentProperties.view.basePath}/*")
             }
     }
 }

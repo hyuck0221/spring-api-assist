@@ -14,6 +14,7 @@ import java.time.LocalDateTime
 class ApiLogFilter(
     private val properties: ApiLogProperties,
     private val storages: List<ApiLogStorage>,
+    private val internalExcludePaths: List<String> = emptyList(),
 ) : OncePerRequestFilter() {
 
     private val log = LoggerFactory.getLogger(ApiLogFilter::class.java)
@@ -24,8 +25,13 @@ class ApiLogFilter(
         response: HttpServletResponse,
         filterChain: FilterChain,
     ) {
-        if (!properties.enabled || !isIncluded(request.requestURI) || isExcluded(request.requestURI) || isStreamRequest(request)) {
+        if (!properties.enabled || !isIncluded(request.requestURI) || isExcluded(request.requestURI)) {
             filterChain.doFilter(request, response)
+            return
+        }
+
+        if (isStreamRequest(request)) {
+            doFilterForStream(request, response, filterChain)
             return
         }
 
@@ -57,19 +63,77 @@ class ApiLogFilter(
         }
     }
 
+    private fun doFilterForStream(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        filterChain: FilterChain,
+    ) {
+        val wrappedRequest = CachingRequestWrapper(request)
+        val requestTime = LocalDateTime.now()
+
+        try {
+            val entry = buildRequestOnlyEntry(wrappedRequest, requestTime)
+            storages.forEach { storage ->
+                try {
+                    storage.save(entry)
+                } catch (e: Exception) {
+                    log.error("Failed to save stream API log via ${storage::class.simpleName}", e)
+                }
+            }
+        } catch (e: Exception) {
+            log.error("Failed to build stream API log entry for ${request.requestURI}", e)
+        }
+
+        filterChain.doFilter(wrappedRequest, response)
+    }
+
     private fun isIncluded(uri: String): Boolean {
         if (properties.includePaths.isEmpty()) return true
         return properties.includePaths.any { pattern -> pathMatcher.match(pattern, uri) }
     }
 
     private fun isExcluded(uri: String): Boolean =
-        properties.excludePaths.any { pattern -> pathMatcher.match(pattern, uri) }
+        internalExcludePaths.any { pattern -> pathMatcher.match(pattern, uri) } ||
+                properties.excludePaths.any { pattern -> pathMatcher.match(pattern, uri) }
 
     private fun isStreamRequest(request: HttpServletRequest): Boolean {
         val accept = request.getHeader("Accept") ?: ""
         val contentType = request.contentType ?: ""
+        val upgrade = request.getHeader("Upgrade") ?: ""
         return accept.contains("text/event-stream", ignoreCase = true) ||
-                contentType.contains("text/event-stream", ignoreCase = true)
+                contentType.contains("text/event-stream", ignoreCase = true) ||
+                upgrade.equals("websocket", ignoreCase = true)
+    }
+
+    private fun buildRequestOnlyEntry(
+        request: CachingRequestWrapper,
+        requestTime: LocalDateTime,
+    ): ApiLogEntry {
+        val requestHeaders: Map<String, String> = request.headerNames.asSequence()
+            .associateWith { headerName ->
+                if (properties.maskHeaders.any { it.equals(headerName, ignoreCase = true) }) "***"
+                else request.getHeader(headerName) ?: ""
+            }
+
+        val requestBody = extractBody(
+            bytes = request.cachedBody,
+            encoding = request.characterEncoding,
+            masked = properties.maskRequestBody,
+            maxSize = properties.maxBodySize,
+        )
+
+        return ApiLogEntry(
+            appName = properties.appName.ifBlank { null },
+            url = request.requestURI,
+            method = request.method,
+            queryParams = request.parameterMap.mapValues { it.value.toList() },
+            requestHeaders = requestHeaders,
+            requestBody = requestBody,
+            requestTime = requestTime,
+            serverName = request.serverName,
+            serverPort = request.serverPort,
+            remoteAddr = request.remoteAddr,
+        )
     }
 
     private fun buildLogEntry(

@@ -130,6 +130,8 @@ class ApiLogViewService(
         q.startTime?.let { conditions += "request_time >= ?"; params += parseDateTime(it) }
         q.endTime?.let { conditions += "request_time <= ?"; params += parseDateTime(it) }
         q.minProcessingTimeMs?.let { conditions += "processing_time_ms >= ?"; params += it }
+        q.remoteAddr?.let { conditions += "remote_addr LIKE CONCAT('%', ?, '%')"; params += it }
+        q.serverName?.let { conditions += "server_name LIKE CONCAT('%', ?, '%')"; params += it }
 
         val whereClause = if (conditions.isEmpty()) "" else "WHERE ${conditions.joinToString(" AND ")}"
         return whereClause to params
@@ -186,12 +188,12 @@ class ApiLogViewService(
             queryParams = rs.getString("query_params")?.jsonToClass<Map<String, List<String>>>() ?: emptyMap(),
             requestHeaders = rs.getString("request_headers")?.jsonToClass<Map<String, String>>() ?: emptyMap(),
             requestBody = rs.getString("request_body"),
-            responseStatus = rs.getInt("response_status"),
+            responseStatus = rs.getObject("response_status") as? Int,
             responseContentType = rs.getString("response_content_type"),
             responseBody = rs.getString("response_body"),
             requestTime = rs.getTimestamp("request_time").toLocalDateTime(),
-            responseTime = rs.getTimestamp("response_time").toLocalDateTime(),
-            processingTimeMs = rs.getLong("processing_time_ms"),
+            responseTime = rs.getTimestamp("response_time")?.toLocalDateTime(),
+            processingTimeMs = rs.getObject("processing_time_ms") as? Long,
             serverName = rs.getString("server_name"),
             serverPort = rs.getObject("server_port") as? Int,
             remoteAddr = rs.getString("remote_addr"),

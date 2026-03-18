@@ -62,6 +62,5 @@ data class ApiLogProperties(
     data class ViewProperties(
         val enabled: Boolean = false,
         val basePath: String = "/api/logs",
-        val apiKey: String = "",
     )
 }

@@ -25,7 +25,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.hyuck0221:spring-api-assist:0.0.1")
+    implementation("com.github.hyuck0221:spring-api-assist:0.0.3")
 }
 ```
 
@@ -37,7 +37,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.hyuck0221:spring-api-assist:0.0.1'
+    implementation 'com.github.hyuck0221:spring-api-assist:0.0.3'
 }
 ```
 
@@ -272,11 +272,11 @@ Query stored logs via REST API. **Disabled by default.** Requires a database sto
 
 ```yaml
 api-assist:
+  api-key: your-secret-key         # Optional API key authentication
   log:
     view:
       enabled: true
       base-path: /api/logs         # Default: /api/logs
-      api-key: your-secret-key     # Optional API key authentication
 ```
 
 ### Endpoints
@@ -313,6 +313,8 @@ api-assist:
 
 ```yaml
 api-assist:
+  api-key: your-secret-key
+
   document:
     enabled: true
     view:
@@ -364,7 +366,6 @@ api-assist:
     view:
       enabled: true
       base-path: /api/logs
-      api-key: your-secret-key
 
   mcp:
     enabled: true

@@ -27,7 +27,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.hyuck0221:spring-api-assist:0.0.1")
+    implementation("com.github.hyuck0221:spring-api-assist:0.0.3")
 }
 ```
 
@@ -39,7 +39,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.hyuck0221:spring-api-assist:0.0.1'
+    implementation 'com.github.hyuck0221:spring-api-assist:0.0.3'
 }
 ```
 
@@ -274,11 +274,11 @@ api-assist:
 
 ```yaml
 api-assist:
+  api-key: your-secret-key         # API 키 인증 (생략 시 인증 없음)
   log:
     view:
       enabled: true
       base-path: /api/logs         # 기본값: /api/logs
-      api-key: your-secret-key     # API 키 인증 (생략 시 인증 없음)
 ```
 
 ### 엔드포인트
@@ -315,6 +315,8 @@ api-assist:
 
 ```yaml
 api-assist:
+  api-key: your-secret-key
+
   document:
     enabled: true
     view:
@@ -366,7 +368,6 @@ api-assist:
     view:
       enabled: true
       base-path: /api/logs
-      api-key: your-secret-key
 
   mcp:
     enabled: true

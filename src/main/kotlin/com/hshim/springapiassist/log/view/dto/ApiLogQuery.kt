@@ -8,6 +8,8 @@ data class ApiLogQuery(
     val startTime: String? = null,
     val endTime: String? = null,
     val minProcessingTimeMs: Long? = null,
+    val remoteAddr: String? = null,
+    val serverName: String? = null,
     val page: Int = 0,
     val size: Int = 20,
     val sortBy: String = "request_time",
