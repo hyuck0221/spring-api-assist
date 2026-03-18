@@ -25,7 +25,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.hyuck0221:spring-api-assist:0.0.3")
+    implementation("com.github.hyuck0221:spring-api-assist:0.0.4")
 }
 ```
 
@@ -37,7 +37,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.hyuck0221:spring-api-assist:0.0.3'
+    implementation 'com.github.hyuck0221:spring-api-assist:0.0.4'
 }
 ```
 

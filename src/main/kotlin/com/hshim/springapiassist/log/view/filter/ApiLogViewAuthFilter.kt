@@ -17,6 +17,11 @@ class ApiLogViewAuthFilter(private val properties: ApiAssistProperties) : OncePe
         response: HttpServletResponse,
         filterChain: FilterChain,
     ) {
+        if (request.method.equals("OPTIONS", ignoreCase = true)) {
+            filterChain.doFilter(request, response)
+            return
+        }
+
         val expectedKey = properties.apiKey.trim()
 
         if (expectedKey.isBlank()) {
