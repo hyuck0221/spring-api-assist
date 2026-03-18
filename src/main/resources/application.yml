@@ -19,6 +19,8 @@ api-assist:
       - Set-Cookie
     mask-request-body: false
     mask-response-body: false
+    mask-request-fields:
+    mask-response-fields:
     max-body-size: 10000
     storage:
       db:

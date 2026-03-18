@@ -215,6 +215,18 @@
       "defaultValue": "JSON"
     },
     {
+      "name": "api-assist.log.mask-request-fields",
+      "type": "java.util.List<java.lang.String>",
+      "description": "JSON field names (or dot-notation paths) in the request body to replace with ***. Only applied when Content-Type is application/json.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties"
+    },
+    {
+      "name": "api-assist.log.mask-response-fields",
+      "type": "java.util.List<java.lang.String>",
+      "description": "JSON field names (or dot-notation paths) in the response body to replace with ***. Only applied when Content-Type is application/json.",
+      "sourceType": "com.hshim.springapiassist.configuration.properties.ApiLogProperties"
+    },
+    {
       "name": "api-assist.log.view.enabled",
       "type": "java.lang.Boolean",
       "description": "Enable the built-in view API (log ingestion + query endpoints). Requires DB storage.",

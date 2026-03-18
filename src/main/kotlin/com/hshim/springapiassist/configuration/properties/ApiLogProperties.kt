@@ -13,6 +13,8 @@ data class ApiLogProperties(
     val maskHeaders: List<String> = listOf("Authorization", "Cookie", "Set-Cookie"),
     val maskRequestBody: Boolean = false,
     val maskResponseBody: Boolean = false,
+    val maskRequestFields: List<String> = emptyList(),
+    val maskResponseFields: List<String> = emptyList(),
     val maxBodySize: Int = 10000,
     val storage: StorageProperties = StorageProperties(),
     val view: ViewProperties = ViewProperties(),

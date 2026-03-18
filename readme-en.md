@@ -107,8 +107,15 @@ api-assist:
       - Set-Cookie
     mask-request-body: false       # Mask request body (default: false)
     mask-response-body: false      # Mask response body (default: false)
+    mask-request-fields:           # Mask specific fields in request body (application/json only)
+      - password
+      - user.creditCard
+    mask-response-fields:          # Mask specific fields in response body (application/json only)
+      - accessToken
     max-body-size: 10000           # Max body capture size in bytes (default: 10000)
 ```
+
+> A plain field name masks that field everywhere in the JSON tree, including nested objects. Use dot-notation (`user.creditCard`) to target a specific path only.
 
 > SSE (`text/event-stream`) requests are automatically excluded from logging.
 
@@ -334,6 +341,11 @@ api-assist:
       - Set-Cookie
     mask-request-body: false
     mask-response-body: false
+    mask-request-fields:
+      - password
+      - user.creditCard
+    mask-response-fields:
+      - accessToken
     max-body-size: 10000
     storage:
       db:

@@ -109,8 +109,15 @@ api-assist:
       - Set-Cookie
     mask-request-body: false       # 요청 바디 마스킹 (기본값: false)
     mask-response-body: false      # 응답 바디 마스킹 (기본값: false)
+    mask-request-fields:           # 요청 바디 특정 필드 마스킹 (application/json 에만 적용)
+      - password
+      - user.creditCard
+    mask-response-fields:          # 응답 바디 특정 필드 마스킹 (application/json 에만 적용)
+      - accessToken
     max-body-size: 10000           # 최대 바디 캡처 크기(bytes) (기본값: 10000)
 ```
+
+> 필드명만 지정하면 중첩 객체를 포함한 전체 트리에서 해당 이름의 필드를 마스킹합니다. 특정 경로만 마스킹하려면 점 표기법(`user.creditCard`)을 사용하세요.
 
 > SSE(text/event-stream) 요청은 자동으로 로깅에서 제외됩니다.
 
@@ -336,6 +343,11 @@ api-assist:
       - Set-Cookie
     mask-request-body: false
     mask-response-body: false
+    mask-request-fields:
+      - password
+      - user.creditCard
+    mask-response-fields:
+      - accessToken
     max-body-size: 10000
     storage:
       db:

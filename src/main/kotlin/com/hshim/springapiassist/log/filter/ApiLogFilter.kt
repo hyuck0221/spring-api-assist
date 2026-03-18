@@ -3,6 +3,8 @@ package com.hshim.springapiassist.log.filter
 import com.hshim.springapiassist.log.storage.ApiLogStorage
 import com.hshim.springapiassist.configuration.properties.ApiLogProperties
 import com.hshim.springapiassist.log.model.ApiLogEntry
+import util.ClassUtil.classToJson
+import util.ClassUtil.jsonToClass
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -118,7 +120,9 @@ class ApiLogFilter(
         val requestBody = extractBody(
             bytes = request.cachedBody,
             encoding = request.characterEncoding,
+            contentType = request.contentType,
             masked = properties.maskRequestBody,
+            maskFields = properties.maskRequestFields,
             maxSize = properties.maxBodySize,
         )
 
@@ -152,14 +156,18 @@ class ApiLogFilter(
         val requestBody = extractBody(
             bytes = request.cachedBody,
             encoding = request.characterEncoding,
+            contentType = request.contentType,
             masked = properties.maskRequestBody,
+            maskFields = properties.maskRequestFields,
             maxSize = properties.maxBodySize,
         )
 
         val responseBody = extractBody(
             bytes = response.cachedBody,
             encoding = response.characterEncoding,
+            contentType = response.contentType,
             masked = properties.maskResponseBody,
+            maskFields = properties.maskResponseFields,
             maxSize = properties.maxBodySize,
         )
 
@@ -185,7 +193,9 @@ class ApiLogFilter(
     private fun extractBody(
         bytes: ByteArray,
         encoding: String?,
+        contentType: String?,
         masked: Boolean,
+        maskFields: List<String>,
         maxSize: Int,
     ): String? {
         if (bytes.isEmpty()) return null
@@ -194,7 +204,51 @@ class ApiLogFilter(
             ?.takeIf { it.isNotBlank() && !it.equals("ISO-8859-1", ignoreCase = true) }
             ?.let { runCatching { charset(it) }.getOrNull() }
             ?: Charsets.UTF_8
-        val body = String(bytes, charset)
+        var body = String(bytes, charset)
+        if (maskFields.isNotEmpty() && contentType?.contains("application/json", ignoreCase = true) == true) {
+            body = maskJsonFields(body, maskFields)
+        }
         return if (body.length > maxSize) "${body.substring(0, maxSize)}...[truncated]" else body
+    }
+
+    private fun maskJsonFields(body: String, fields: List<String>): String {
+        return try {
+            val root = body.jsonToClass<Any>()
+            when (root) {
+                is MutableMap<*, *> -> @Suppress("UNCHECKED_CAST") maskMap(root as MutableMap<String, Any?>, fields)
+                is List<*> -> root.filterIsInstance<MutableMap<String, Any?>>().forEach { maskMap(it, fields) }
+            }
+            root.classToJson()
+        } catch (e: Exception) {
+            body
+        }
+    }
+
+    private fun maskMap(map: MutableMap<String, Any?>, fields: List<String>) {
+        val flatFields = mutableListOf<String>()
+        for (field in fields) {
+            val dotIdx = field.indexOf('.')
+            if (dotIdx == -1) {
+                if (map.containsKey(field)) map[field] = "***"
+                flatFields += field
+            } else {
+                val head = field.substring(0, dotIdx)
+                val tail = field.substring(dotIdx + 1)
+                @Suppress("UNCHECKED_CAST")
+                when (val child = map[head]) {
+                    is MutableMap<*, *> -> maskMap(child as MutableMap<String, Any?>, listOf(tail))
+                    is List<*> -> child.filterIsInstance<MutableMap<String, Any?>>().forEach { maskMap(it, listOf(tail)) }
+                }
+            }
+        }
+        if (flatFields.isNotEmpty()) {
+            map.values.forEach { child ->
+                @Suppress("UNCHECKED_CAST")
+                when (child) {
+                    is MutableMap<*, *> -> maskMap(child as MutableMap<String, Any?>, flatFields)
+                    is List<*> -> child.filterIsInstance<MutableMap<String, Any?>>().forEach { maskMap(it, flatFields) }
+                }
+            }
+        }
     }
 }
