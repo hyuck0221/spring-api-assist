@@ -10,15 +10,21 @@ import java.io.InputStreamReader
 
 internal class CachingRequestWrapper(request: HttpServletRequest) : HttpServletRequestWrapper(request) {
 
-    val cachedBody: ByteArray = request.inputStream.readBytes()
+    private val isMultipart = request.contentType?.contains("multipart/", ignoreCase = true) == true
 
-    override fun getInputStream(): ServletInputStream = object : ServletInputStream() {
-        private val buf = ByteArrayInputStream(cachedBody)
-        override fun read(): Int = buf.read()
-        override fun read(b: ByteArray, off: Int, len: Int): Int = buf.read(b, off, len)
-        override fun isFinished(): Boolean = buf.available() == 0
-        override fun isReady(): Boolean = true
-        override fun setReadListener(listener: ReadListener?) {}
+    val cachedBody: ByteArray = if (isMultipart) byteArrayOf() else request.inputStream.readBytes()
+
+    override fun getInputStream(): ServletInputStream = if (isMultipart) {
+        super.getInputStream()
+    } else {
+        object : ServletInputStream() {
+            private val buf = ByteArrayInputStream(cachedBody)
+            override fun read(): Int = buf.read()
+            override fun read(b: ByteArray, off: Int, len: Int): Int = buf.read(b, off, len)
+            override fun isFinished(): Boolean = buf.available() == 0
+            override fun isReady(): Boolean = true
+            override fun setReadListener(listener: ReadListener?) {}
+        }
     }
 
     override fun getReader(): BufferedReader =
